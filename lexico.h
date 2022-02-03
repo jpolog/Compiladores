@@ -1,0 +1,11 @@
+#define IDEN    1
+#define MAS     2
+#define MENOS   3
+#define POR     4
+#define DIV     5
+#define PYC     6
+#define PARI    7
+#define PARD    8
+#define IGUAL   9
+#define ENTERO  10
+#define PRINT   11
