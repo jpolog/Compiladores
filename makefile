@@ -9,5 +9,5 @@ lex.yy.c : lexico.l lexico.h
 clean : 
 	rm -f lexico lex.yy.c
 
-run : lexico prueba.txt
-	./lexico prueba.txt
+run : lexico miniC.txt
+	./lexico miniC.txt

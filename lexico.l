@@ -3,12 +3,14 @@
 %{
  #include <stdio.h>
  #include "lexico.h"
+ #define MAXNUM 2147483648
  void error_lexico();
+ int is_rango(char* s);
 %}
 
 digito [0-9]
 letra  [a-zA-Z]
-panico [^ \n\s\ta-zA-Z_0-9+\-*/();=]+
+panico [^ \n\s\ta-zA-Z_0-9+\-*/();=,{}]+
 
 %option yylineno
 
@@ -32,21 +34,33 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=]+
  /* El código C de después devuelve el código entero del token (los tokens estan simbolizados por enteros)*/
  /* Se desambigua por orden de aparición */
  
-"print"                        { return PRINT; }
-{letra}({letra}|{digito})*     { return IDEN; }
-"+"                            { return MAS; }
-"-"                            { return MENOS; }
-"*"                            { return POR;   }
-"/"                            { return DIV;   }
-"("                            { return PARI;  }
-")"                            { return PARD;  }
-","                            { return COMA;}
-";"                            { return PYC;   }
-{digito}+                      { return ENTERO;}
-"="                            { return IGUAL; }
-\"([^"\n]|\\\")*\"             { return STRING; }
-\"([^"\n]|\\\")*               { error_lexico(); }
-{panico}                       { error_lexico(); }
+"void"                                { return VOID;    }
+"var"                                 { return VAR;     }
+"const"                               { return CONST;   }
+"if"                                  { return IF;      }
+"else"                                { return ELSE;    }
+"while"                               { return WHILE;   }
+"print"                               { return PRINT;   }
+"read"                                { return READ;    }
+{letra}({letra}|{digito}|_){0,15}     { return IDEN;    }
+"+"                                   { return MAS;     }
+"-"                                   { return MENOS;   }
+"*"                                   { return POR;     }
+"/"                                   { return DIV;     }
+"("                                   { return PARI;    }
+")"                                   { return PARD;    }
+","                                   { return COMA;    }
+";"                                   { return PYC;     }
+{digito}+                             { if (is_rango(yytext))
+                                            return ENTERO;
+                                        else
+                                            error_lexico();  }
+"="                                   { return IGUAL;   }
+"{"                                   { return LLAVEI;  }
+"}"                                   { return LLAVED;  }
+\"([^"\n]|\\\")*\"                    { return STRING;  }
+\"([^"\n]|\\\")*                      { error_lexico(); }
+{panico}                              { error_lexico(); }
 
 %%
 
@@ -55,4 +69,9 @@ void error_lexico()
 {
     printf("Error lexico en la linea %d: %s\n", 
             yylineno, yytext);
+}
+
+int is_rango(char* s){
+    long l = atol(s);
+    return (l < MAXNUM) && (l > -MAXNUM);
 }

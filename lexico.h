@@ -11,3 +11,12 @@
 #define PRINT   11
 #define STRING  12
 #define COMA    13
+#define VOID    14
+#define VAR     15
+#define CONST   16
+#define IF      17
+#define ELSE    18
+#define WHILE   19
+#define READ    21
+#define LLAVEI  22
+#define LLAVED  23
