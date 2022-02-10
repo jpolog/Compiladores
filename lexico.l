@@ -12,17 +12,25 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=]+
 
 %option yylineno
 
+%x comentario
+
 %%
 
  /* Expresiones regulares de comentarios y blancos */
 "//".*                         { }
 [ \t\r\n]+                     { }
+"/*"                           { BEGIN(comentario); }
+<comentario>"*/"               { BEGIN(INITIAL); }
+<comentario>(.|\n)             { }
+
+
+ /* Expresiones regulares de tokens */ 
 
 
  /* Esta segunda sección contiene las expresiones regulares de tokens */ 
  /* La sustitucción de la macro se hace con las {} */
  /* El código C de después devuelve el código entero del token (los tokens estan simbolizados por enteros)*/
- /* Se desambigua (porfis RAE añade esto al diccionario) por orden de aparición */
+ /* Se desambigua por orden de aparición */
  
 "print"                        { return PRINT; }
 {letra}({letra}|{digito})*     { return IDEN; }
@@ -32,20 +40,15 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=]+
 "/"                            { return DIV;   }
 "("                            { return PARI;  }
 ")"                            { return PARD;  }
+","                            { return COMA;}
 ";"                            { return PYC;   }
 {digito}+                      { return ENTERO;}
 "="                            { return IGUAL; }
+\"([^"\n]|\\\")*\"             { return STRING; }
+\"([^"\n]|\\\")*               { error_lexico(); }
 {panico}                       { error_lexico(); }
 
 %%
-
-int main(int argc, char *argv[]){
-    
-    int token;
-    while ( (token = yylex()) != 0){
-        printf("Token %d: %s\n", token, yytext);
-    }
-}
 
 
 void error_lexico()

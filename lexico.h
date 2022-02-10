@@ -9,3 +9,5 @@
 #define IGUAL   9
 #define ENTERO  10
 #define PRINT   11
+#define STRING  12
+#define COMA    13
