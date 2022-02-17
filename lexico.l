@@ -5,7 +5,9 @@
  #include "lexico.h"
  #define MAXNUM 2147483648
  void error_lexico();
+ void error_comment();
  int is_rango(char* s);
+ int yylinecomm;
 %}
 
 digito [0-9]
@@ -21,9 +23,14 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=,{}]+
  /* Expresiones regulares de comentarios y blancos */
 "//".*                         { }
 [ \t\r\n]+                     { }
-"/*"                           { BEGIN(comentario); }
+"/*"                           { BEGIN(comentario);
+                                    yylinecomm = yylineno;
+                                 }
 <comentario>"*/"               { BEGIN(INITIAL); }
 <comentario>(.|\n)             { }
+<comentario><<EOF>>            { 
+                                    error_comment();
+                                    return 0 ; }
 
 
  /* Expresiones regulares de tokens */ 
@@ -69,6 +76,11 @@ void error_lexico()
 {
     printf("Error lexico en la linea %d: %s\n", 
             yylineno, yytext);
+}
+
+void error_comment()
+{
+    printf("Error lexico en la linea %d: Comentario sin cerrar\n", yylinecomm);
 }
 
 int is_rango(char* s){
