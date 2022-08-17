@@ -2,12 +2,14 @@
 
 %{
  #include <stdio.h>
- #include "lexico.h"
+ #include "minic.tab.h"
  #define MAXNUM 2147483648
+ #define LONG_ID 16
  void error_lexico();
  void error_comment();
+ int is_length();
  int is_rango(char* s);
- int yylinecomm;
+ int yylinecomm = 0;
 %}
 
 digito [0-9]
@@ -46,10 +48,14 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=,{}]+
 "const"                               { return CONST;   }
 "if"                                  { return IF;      }
 "else"                                { return ELSE;    }
+"do"                    	       { return DO;   }
 "while"                               { return WHILE;   }
+"for"                   		{ return FOR;  }
 "print"                               { return PRINT;   }
 "read"                                { return READ;    }
-{letra}({letra}|{digito}|_){0,15}     { return IDEN;    }
+{letra}({letra}|{digito})*            { if (is_length(yytext)) return IDENT;
+                         		  else error_lexico();}
+
 "+"                                   { return MAS;     }
 "-"                                   { return MENOS;   }
 "*"                                   { return POR;     }
@@ -75,12 +81,19 @@ panico [^ \n\s\ta-zA-Z_0-9+\-*/();=,{}]+
 void error_lexico()
 {
     printf("Error lexico en la linea %d: %s\n", 
+    
             yylineno, yytext);
 }
 
 void error_comment()
 {
     printf("Error lexico en la linea %d: Comentario sin cerrar\n", yylinecomm);
+}
+
+int is_length(char* s)
+{
+    int length = strlen(s);
+    return length <= LONG_ID;
 }
 
 int is_rango(char* s){
